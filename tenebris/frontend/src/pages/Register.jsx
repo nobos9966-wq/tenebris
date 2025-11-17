@@ -1,0 +1,104 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import api from '../services/api';
+import { useAuthStore } from '../store/authStore';
+
+export default function Register() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data } = await api.post('/auth/register', { username, password, email });
+      setAuth(data.token, data.user);
+      toast.success(`¡Bienvenido a Tenebris, ${data.user.username}!`);
+      navigate('/');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al registrarse');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-purple to-neon-pink bg-clip-text text-transparent mb-2">
+            TENEBRIS
+          </h1>
+          <p className="text-gray-400">Únete a la comunidad</p>
+        </div>
+
+        <div className="bg-dark-card p-8 rounded-2xl border border-dark-border">
+          <h2 className="text-2xl font-bold mb-6">Registro Rápido</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Usuario</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:outline-none focus:border-neon-purple transition"
+                minLength={3}
+                maxLength={20}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Contraseña</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:outline-none focus:border-neon-purple transition"
+                minLength={6}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Email (opcional)</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:outline-none focus:border-neon-purple transition"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-neon-purple to-neon-pink rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
+            >
+              {loading ? 'Registrando...' : 'Registrarse'}
+            </button>
+          </form>
+
+          <p className="text-center mt-6 text-gray-400">
+            ¿Ya tienes cuenta?{' '}
+            <Link to="/login" className="text-neon-purple hover:underline">
+              Inicia sesión
+            </Link>
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
