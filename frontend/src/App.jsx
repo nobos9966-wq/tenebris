@@ -11,9 +11,12 @@ import CreatePost from './pages/CreatePost';
 import Chat from './pages/Chat';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
+import TestConnection from './pages/TestConnection';
 
 function App() {
   const { token, user } = useAuthStore();
+
+  console.log('🔐 Auth State:', { hasToken: !!token, user: user?.username });
 
   return (
     <Router>
@@ -22,17 +25,18 @@ function App() {
         {token && <Navbar />}
         
         <Routes>
-          <Route path="/login" element={!token ? <Login /> : <Navigate to="/" />} />
-          <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
+          <Route path="/test" element={<TestConnection />} />
+          <Route path="/login" element={!token ? <Login /> : <Navigate to="/" replace />} />
+          <Route path="/register" element={!token ? <Register /> : <Navigate to="/" replace />} />
           
-          <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
-          <Route path="/board/:slug" element={token ? <Board /> : <Navigate to="/login" />} />
-          <Route path="/post/:id" element={token ? <Post /> : <Navigate to="/login" />} />
-          <Route path="/create" element={token ? <CreatePost /> : <Navigate to="/login" />} />
-          <Route path="/chat" element={token ? <Chat /> : <Navigate to="/login" />} />
-          <Route path="/chat/:userId" element={token ? <Chat /> : <Navigate to="/login" />} />
-          <Route path="/profile/:id" element={token ? <Profile /> : <Navigate to="/login" />} />
-          <Route path="/admin" element={token && user?.role === 'admin' ? <Admin /> : <Navigate to="/" />} />
+          <Route path="/" element={token ? <Home /> : <Navigate to="/login" replace />} />
+          <Route path="/board/:slug" element={token ? <Board /> : <Navigate to="/login" replace />} />
+          <Route path="/post/:id" element={token ? <Post /> : <Navigate to="/login" replace />} />
+          <Route path="/create" element={token ? <CreatePost /> : <Navigate to="/login" replace />} />
+          <Route path="/chat" element={token ? <Chat /> : <Navigate to="/login" replace />} />
+          <Route path="/chat/:userId" element={token ? <Chat /> : <Navigate to="/login" replace />} />
+          <Route path="/profile/:id" element={token ? <Profile /> : <Navigate to="/login" replace />} />
+          <Route path="/admin" element={token && user?.role === 'admin' ? <Admin /> : <Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>

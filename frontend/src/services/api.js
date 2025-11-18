@@ -1,16 +1,24 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
+// Configuración de la URL base
+const baseURL = import.meta.env.VITE_API_URL || '/api';
+
+console.log('🌐 API Base URL configurada:', baseURL);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL,
   timeout: 30000, // 30 segundos timeout
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true
 });
 
 api.interceptors.request.use(
   (config) => {
+    console.log('📤 Request:', config.method?.toUpperCase(), config.url);
+    
     const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -18,30 +26,36 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
+    console.error('❌ Request error:', error);
     return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ Response:', response.status, response.config.url);
+    return response;
+  },
   (error) => {
-    console.error('Response error:', error);
+    console.error('❌ Response error:', error);
     
     // Error de red o timeout
     if (!error.response) {
-      console.error('Network error or timeout');
+      console.error('🔴 Network error or timeout');
       return Promise.reject({
         response: {
           data: {
-            error: 'Error de conexión. Verifica tu internet o intenta más tarde.'
+            error: 'Error de conexión. El servidor puede estar iniciando (espera 30-60 segundos) o verifica tu internet.'
           }
         }
       });
     }
     
-    // Token inválido o expirado
-    if (error.response?.status === 401) {
+    console.error('🔴 Status:', error.response.status);
+    console.error('🔴 Data:', error.response.data);
+    
+    // Token inválido o expirado (solo si no estamos en login/register)
+    if (error.response?.status === 401 && !error.config.url.includes('/auth/')) {
       useAuthStore.getState().logout();
       window.location.href = '/login';
     }

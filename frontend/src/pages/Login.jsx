@@ -23,19 +23,33 @@ export default function Login() {
     setLoading(true);
 
     try {
-      console.log('Intentando login con:', { username });
-      const { data } = await api.post('/auth/login', { 
+      console.log('🔐 Intentando login con:', { username: username.trim() });
+      console.log('📡 URL de API:', import.meta.env.VITE_API_URL);
+      
+      const response = await api.post('/auth/login', { 
         username: username.trim(), 
         password 
       });
       
-      console.log('Login exitoso:', data);
-      setAuth(data.token, data.user);
-      toast.success(`¡Bienvenido a Tenebris, ${data.user.username}!`);
-      navigate('/');
+      console.log('✅ Login exitoso:', response.data);
+      
+      if (response.data.success && response.data.token && response.data.user) {
+        setAuth(response.data.token, response.data.user);
+        toast.success(`¡Bienvenido a Tenebris, ${response.data.user.username}!`);
+        
+        // Pequeño delay para asegurar que el estado se actualice
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
+      } else {
+        toast.error('Respuesta inválida del servidor');
+      }
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('❌ Error en login:', error);
+      console.error('Error completo:', error.response || error);
+      
       const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message ||
                           error.message || 
                           'Error al iniciar sesión. Verifica tu conexión.';
       toast.error(errorMessage);

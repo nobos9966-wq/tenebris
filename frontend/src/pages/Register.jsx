@@ -34,21 +34,35 @@ export default function Register() {
     setLoading(true);
 
     try {
-      console.log('Intentando registro con:', { username });
-      const { data } = await api.post('/auth/register', { 
+      console.log('📝 Intentando registro con:', { username: username.trim() });
+      console.log('📡 URL de API:', import.meta.env.VITE_API_URL);
+      
+      const response = await api.post('/auth/register', { 
         username: username.trim(), 
         password,
         email: email.trim() || undefined
       });
       
-      console.log('Registro exitoso:', data);
-      setAuth(data.token, data.user);
-      toast.success(`¡Bienvenido a Tenebris, ${data.user.username}!`);
-      navigate('/');
+      console.log('✅ Registro exitoso:', response.data);
+      
+      if (response.data.success && response.data.token && response.data.user) {
+        setAuth(response.data.token, response.data.user);
+        toast.success(`¡Bienvenido a Tenebris, ${response.data.user.username}!`);
+        
+        // Pequeño delay para asegurar que el estado se actualice
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
+      } else {
+        toast.error('Respuesta inválida del servidor');
+      }
     } catch (error) {
-      console.error('Error en registro:', error);
+      console.error('❌ Error en registro:', error);
+      console.error('Error completo:', error.response || error);
+      
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.errors?.[0]?.msg ||
+                          error.response?.data?.message ||
                           error.message || 
                           'Error al registrarse. Verifica tu conexión.';
       toast.error(errorMessage);
