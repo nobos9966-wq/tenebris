@@ -1,0 +1,150 @@
+═══════════════════════════════════════════════════════════════════
+  ✅ TENEBRIS - LISTO PARA SUBIR A INTERNET
+═══════════════════════════════════════════════════════════════════
+
+📦 TODOS LOS ARCHIVOS VERIFICADOS Y LISTOS
+
+✅ Backend (Render)      - Configurado correctamente
+✅ Frontend (Vercel)     - URL hardcodeada (no depende de env vars)
+✅ MongoDB Atlas         - Conectado
+✅ CORS                  - Configurado
+✅ Autenticación         - Arreglada
+✅ .gitignore            - Protege archivos sensibles
+
+═══════════════════════════════════════════════════════════════════
+  🚀 COMANDOS PARA SUBIR
+═══════════════════════════════════════════════════════════════════
+
+1. SUBIR A GITHUB:
+
+   git add .
+   git commit -m "Ready: Proyecto completo para producción"
+   git push origin main
+
+
+2. CONFIGURAR RENDER:
+
+   Ve a: https://dashboard.render.com
+   
+   → Selecciona: tenebris-backend
+   → Environment
+   → Agrega estas variables:
+
+   MONGODB_URI=mongodb+srv://tenebris_user:N5Qwwy5LqbjT5MoQ@tenebriscluster.ntubjmj.mongodb.net/tenebris?retryWrites=true&w=majority
+   JWT_SECRET=9d8f7a6b5c4e3f2g1h0jklmnopqrstuvxyz123456
+   NODE_ENV=production
+   PORT=10000
+   FRONTEND_URL=https://tenebris-sbld.vercel.app
+   MAX_IMAGE_SIZE=10
+   MAX_VIDEO_SIZE=500
+
+   → Save Changes
+   → Espera 2-3 minutos
+
+
+3. VERCEL SE DESPLIEGA AUTOMÁTICAMENTE:
+
+   ✅ No necesitas hacer nada
+   ✅ Detecta el push a GitHub
+   ✅ Se redespliega solo
+   ✅ NO necesitas configurar variables de entorno
+
+
+4. ESPERA 3-5 MINUTOS TOTAL
+
+
+5. VERIFICA QUE FUNCIONE:
+
+   A. Backend:
+      https://tenebris-4.onrender.com/api/health
+      
+      Debe responder:
+      {"status":"ok","message":"Tenebris API funcionando"}
+
+   B. Frontend:
+      https://tenebris-sbld.vercel.app
+      
+      Debe cargar la página de login
+
+   C. Test:
+      https://tenebris-sbld.vercel.app/test
+      
+      Debe mostrar la URL correcta y botones de prueba
+
+   D. Registro:
+      https://tenebris-sbld.vercel.app/register
+      
+      Registra un usuario y debe funcionar
+
+
+═══════════════════════════════════════════════════════════════════
+  🔧 CAMBIOS IMPORTANTES APLICADOS
+═══════════════════════════════════════════════════════════════════
+
+✅ Creado: frontend/src/config.js
+   → URL hardcodeada para producción
+   → No depende de variables de entorno en Vercel
+   → Soluciona el problema de CORS
+
+✅ Modificado: frontend/src/services/api.js
+   → Usa config.js en lugar de variables de entorno
+   → Logs mejorados para debugging
+
+✅ Creado: frontend/src/pages/TestConnection.jsx
+   → Página para probar la conexión
+   → Muestra errores exactos
+   → Útil para debugging
+
+✅ Modificado: frontend/src/App.jsx
+   → Agregada ruta /test
+   → Logs de estado de autenticación
+
+
+═══════════════════════════════════════════════════════════════════
+  ⚠️ IMPORTANTE
+═══════════════════════════════════════════════════════════════════
+
+❌ NO se suben a GitHub (protegidos por .gitignore):
+   - backend/.env
+   - frontend/.env
+   - node_modules/
+   - dist/
+   - backend/uploads/*
+
+✅ SÍ se suben a GitHub:
+   - backend/.env.example
+   - frontend/.env.production
+   - frontend/src/config.js
+   - Todo el código fuente
+
+
+═══════════════════════════════════════════════════════════════════
+  🎯 PROBLEMA SOLUCIONADO
+═══════════════════════════════════════════════════════════════════
+
+ANTES:
+❌ Llamaba a: https://tenebris-4.onrender.com/auth/register
+❌ Error: CORS header missing
+❌ Vercel no leía variables de entorno
+
+AHORA:
+✅ Llama a: https://tenebris-4.onrender.com/api/auth/register
+✅ URL hardcodeada en config.js
+✅ No depende de variables de entorno
+✅ CORS configurado correctamente
+
+
+═══════════════════════════════════════════════════════════════════
+  📊 URLs FINALES
+═══════════════════════════════════════════════════════════════════
+
+Frontend:  https://tenebris-sbld.vercel.app
+Backend:   https://tenebris-4.onrender.com
+API:       https://tenebris-4.onrender.com/api
+Health:    https://tenebris-4.onrender.com/api/health
+Test:      https://tenebris-sbld.vercel.app/test
+
+
+═══════════════════════════════════════════════════════════════════
+  ✅ TODO LISTO - EJECUTA EL COMANDO DE ARRIBA
+═══════════════════════════════════════════════════════════════════

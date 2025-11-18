@@ -1,14 +1,12 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import config from '../config';
 
-// Configuración de la URL base
-const baseURL = import.meta.env.VITE_API_URL || '/api';
-
-console.log('🌐 API Base URL configurada:', baseURL);
+console.log('🌐 API Base URL configurada:', config.apiUrl);
 
 const api = axios.create({
-  baseURL,
-  timeout: 30000, // 30 segundos timeout
+  baseURL: config.apiUrl,
+  timeout: config.apiTimeout,
   headers: {
     'Content-Type': 'application/json'
   },
