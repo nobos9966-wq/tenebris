@@ -10,40 +10,55 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
+
+// Configuración CORS - Definir origins primero
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL, 'https://tenebris.vercel.app', 'https://tenebris-nine.vercel.app'].filter(Boolean)
+  : ['http://localhost:5173', 'http://localhost:5174'];
+
+// Socket.io con la misma configuración CORS
 const io = socketIo(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? [process.env.FRONTEND_URL || 'https://tenebris.vercel.app', 'https://tenebris-nine.vercel.app']
-      : ['http://localhost:5173', 'http://localhost:5174'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
   }
 });
 
-// Middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
-app.use(compression());
-
-// Configuración CORS completa
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL || 'https://tenebris.vercel.app', 'https://tenebris-nine.vercel.app']
-    : ['http://localhost:5173', 'http://localhost:5174'],
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 86400 // 24 horas
+  maxAge: 86400, // 24 horas
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
+// CORS debe ir ANTES de helmet
 app.use(cors(corsOptions));
 
-// Manejar preflight requests explícitamente
+// Manejar preflight requests explícitamente ANTES de cualquier otra cosa
 app.options('*', cors(corsOptions));
 
+// Middleware de seguridad
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
+}));
+
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

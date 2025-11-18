@@ -14,15 +14,31 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!username.trim() || !password.trim()) {
+      toast.error('Por favor completa todos los campos');
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      const { data } = await api.post('/auth/login', { username, password });
+      console.log('Intentando login con:', { username });
+      const { data } = await api.post('/auth/login', { 
+        username: username.trim(), 
+        password 
+      });
+      
+      console.log('Login exitoso:', data);
       setAuth(data.token, data.user);
       toast.success(`¡Bienvenido a Tenebris, ${data.user.username}!`);
       navigate('/');
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Error al iniciar sesión');
+      console.error('Error en login:', error);
+      const errorMessage = error.response?.data?.error || 
+                          error.message || 
+                          'Error al iniciar sesión. Verifica tu conexión.';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

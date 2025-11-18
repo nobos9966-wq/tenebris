@@ -15,15 +15,43 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!username.trim() || !password.trim()) {
+      toast.error('Por favor completa todos los campos obligatorios');
+      return;
+    }
+    
+    if (username.length < 3 || username.length > 20) {
+      toast.error('El usuario debe tener entre 3 y 20 caracteres');
+      return;
+    }
+    
+    if (password.length < 6) {
+      toast.error('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      const { data } = await api.post('/auth/register', { username, password, email });
+      console.log('Intentando registro con:', { username });
+      const { data } = await api.post('/auth/register', { 
+        username: username.trim(), 
+        password,
+        email: email.trim() || undefined
+      });
+      
+      console.log('Registro exitoso:', data);
       setAuth(data.token, data.user);
       toast.success(`¡Bienvenido a Tenebris, ${data.user.username}!`);
       navigate('/');
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Error al registrarse');
+      console.error('Error en registro:', error);
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.errors?.[0]?.msg ||
+                          error.message || 
+                          'Error al registrarse. Verifica tu conexión.';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
