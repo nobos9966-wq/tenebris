@@ -13,8 +13,16 @@ const server = http.createServer(app);
 
 // Configuración CORS - Definir origins primero
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL, 'https://tenebris-sbld.vercel.app', 'https://tenebris.vercel.app', 'https://tenebris-nine.vercel.app'].filter(Boolean)
+  ? [
+      process.env.FRONTEND_URL, 
+      'https://tenebris-sbld.vercel.app',
+      'https://tenebris.vercel.app', 
+      'https://tenebris-nine.vercel.app'
+    ].filter(Boolean)
   : ['http://localhost:5173', 'http://localhost:5174'];
+
+// Log para debugging
+console.log('🌐 CORS - Orígenes permitidos:', allowedOrigins);
 
 // Socket.io con la misma configuración CORS
 const io = socketIo(server, {
